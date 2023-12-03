@@ -4,6 +4,7 @@ let incompleteTasks = document.getElementById("incomplete-tasks");
 let completedTasks = document.getElementById("completed-tasks");
 let clearButton = document.getElementById("clear");
 let dark_mode_button = document.getElementById("dark_mode");
+let excel_upload = document.getElementById("excelUpload");
 
 let createNewTask = function(taskName) {
     let listItem = document.createElement("li");
@@ -69,6 +70,8 @@ let taskIncomplete = function() {
     incompleteTasks.appendChild(listItem);
     bindTaskEvents(listItem, taskCompleted);
 }
+
+
 addButton.addEventListener("click", addTask);
 let bindTaskEvents = function(taskListItem, checkBoxEventHandler) {
     let checkBox = taskListItem.querySelector('input[type="checkbox"]');
@@ -90,3 +93,29 @@ let dark_mode = function(){
     element.classList.toggle("dark_mode");
 }
 dark_mode_button.addEventListener('click', dark_mode);
+
+
+let uploadExcelData = function() {
+    
+    fetch('/upload')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+
+                    input = `${item["Task Name"]} - Date Created: ${item["Date Created"]} - Priority: ${item["Priority"]} - Duration: ${item["Time to Complete"]}`;
+                    let listItem = createNewTask(input);
+                    
+                    if (item["Completion Status"] === "Completed") {
+                        completedTasks.appendChild(listItem);
+                        bindTaskEvents(listItem, taskCompleted);
+                    } else {
+                        incompleteTasks.appendChild(listItem);
+                        bindTaskEvents(listItem, taskCompleted);
+                    }
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+}
+
+excel_upload.addEventListener('click', uploadExcelData);
